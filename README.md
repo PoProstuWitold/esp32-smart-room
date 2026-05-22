@@ -92,13 +92,17 @@ The device monitors room conditions, displays live data locally on the TFT scree
 
 ---
 
-## Demo / Photos
+# Demo / Photos
 
-### Final build
+<details>
+  <summary><strong>Final build</strong></summary>
 
 ![Final build](docs/images/final_build.jpg)
 
-### TFT screens
+</details>
+
+<details>
+  <summary><strong>TFT screens</strong></summary>
 
 There are 4 TFT screens in total.
 
@@ -118,15 +122,23 @@ There are 4 TFT screens in total.
 
 ![TFT INFO](docs/images/tft_info.jpg)
 
-### Web dashboard
+</details>
+
+<details>
+  <summary><strong>Web dashboard</strong></summary>
 
 ![Web dashboard 1](docs/images/web1.png)
 
 ![Web dashboard 2](docs/images/web2.png)
 
-### Wiring diagram
+</details>
+
+<details>
+  <summary><strong>Wiring diagram</strong></summary>
 
 ![Fritzing wiring diagram](docs/images/fritzing_wiring.png)
+
+</details>
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
