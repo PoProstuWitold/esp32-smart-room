@@ -13,15 +13,7 @@ The device monitors room conditions, displays live data locally on the TFT scree
   <summary><h3>Table of Contents</h3></summary>
   <ol>
     <li><a href="#features">Features</a></li>
-    <li>
-      <a href="#demo--photos">Demo / Photos</a>
-      <ul>
-        <li><a href="#final-build">Final build</a></li>
-        <li><a href="#tft-screens">TFT screens</a></li>
-        <li><a href="#web-dashboard">Web dashboard</a></li>
-        <li><a href="#wiring-diagram">Wiring diagram</a></li>
-      </ul>
-    </li>
+    <li><a href="#demo--photos">Demo / Photos</a></li>
     <li><a href="#hardware">Hardware</a></li>
     <li><a href="#how-it-works">How It Works</a></li>
     <li>
@@ -72,7 +64,9 @@ The device monitors room conditions, displays live data locally on the TFT scree
 
 
 > [!NOTE]
-> This is a compact academic and portfolio-oriented IoT prototype. The code intentionally keeps the whole application in one Arduino sketch to make deployment and review easier.
+> This is a compact academic and portfolio-oriented IoT prototype. The code intentionally keeps the whole application in one Arduino sketch to make deployment and review easier. 
+>
+> The most important parts of this repository are the working hardware prototype, TFT interface, web dashboard, wiring documentation and reproducible `TFT_eSPI` configuration.
 
 ## Features
 
@@ -92,7 +86,9 @@ The device monitors room conditions, displays live data locally on the TFT scree
 
 ---
 
-# Demo / Photos
+## Demo / Photos
+
+Hardware photos, TFT screenshots, web dashboard preview and Fritzing wiring diagram.
 
 <details>
   <summary><strong>Final build</strong></summary>
@@ -146,6 +142,9 @@ There are 4 TFT screens in total.
 
 ## Hardware
 
+> [!IMPORTANT]
+> All modules in this setup are powered from **3.3V**. Do not connect the BME280, TFT logic or RTC data lines to 5V logic.
+
 | Component | Purpose |
 |---|---|
 | Freenove ESP32 Wrover | Main microcontroller |
@@ -162,6 +161,9 @@ There are 4 TFT screens in total.
 ---
 
 ## How It Works
+
+> [!NOTE]
+> The RGB LED state is based on configurable temperature thresholds stored in ESP32 non-volatile memory.
 
 The ESP32 reads environmental data from the BME280 sensor and time data from the DS3231 RTC module. The current room state is displayed on the TFT touchscreen and can also be checked in the web dashboard.
 
@@ -183,6 +185,9 @@ Settings such as temperature thresholds and buzzer state are stored using ESP32 
 ---
 
 ## User Interfaces
+
+> [!TIP]
+> The project provides both a local TFT interface and a browser-based dashboard, so the device can be used without any external server.
 
 ### TFT Touchscreen
 
@@ -206,6 +211,9 @@ The ESP32 creates its own WiFi access point and serves a web dashboard.
 | SSID | `SmartRoom-ESP32` |
 | Password | `12345678` |
 | Dashboard URL | `http://192.168.4.1` |
+
+> [!WARNING]
+> The ESP32 runs in access point mode, so the dashboard is available only after connecting directly to the device WiFi network.
 
 The web dashboard allows you to:
 
@@ -232,6 +240,9 @@ The BME280 and DS3231 modules share the same I2C bus.
 |---|---|
 | SDA | GPIO21 |
 | SCL | GPIO22 |
+
+> [!NOTE]
+> BME280 modules may use either `0x76` or `0x77`, depending on the board variant.
 
 Typical I2C addresses:
 
@@ -317,7 +328,10 @@ The passive buzzer is controlled with PWM, which allows it to play simple tones 
 
 ## Software
 
-The project is written for the Arduino ecosystem and uses the following libraries:
+> [!NOTE]
+> The project targets the Arduino ecosystem on ESP32 and uses common libraries available through the Arduino IDE Library Manager.
+
+The project is written using the Arduino ecosystem and uses the following libraries:
 
 - `SPI.h`
 - `Wire.h`
@@ -353,6 +367,9 @@ docs/tft/User_Setup.h
 ```
 
 To use the same display setup, copy this file into your local `TFT_eSPI` library directory and replace the default `User_Setup.h`.
+
+> [!WARNING]
+> Back up your existing `TFT_eSPI/User_Setup.h` before replacing it, especially if you use the same Arduino installation for other TFT projects.
 
 ### Display driver
 
@@ -428,7 +445,7 @@ The configuration enables the standard TFT_eSPI fonts and smooth fonts:
 #define SPI_TOUCH_FREQUENCY 2500000
 ```
 
-> The `docs/tft/User_Setup.h` file is included as a ready-to-use configuration reference for this exact ESP32 + TFT wiring.
+The `docs/tft/User_Setup.h` file is included as a ready-to-use configuration reference for this exact ESP32 + TFT wiring.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -446,6 +463,9 @@ cd esp32-smart-room
 ### 2. Install required libraries
 
 Install the required Arduino libraries manually in the Arduino IDE.
+
+> [!TIP]
+> If the BME280 library does not compile, also install `Adafruit Unified Sensor` and `Adafruit BusIO`.
 
 ### 3. Configure `TFT_eSPI`
 
@@ -493,6 +513,9 @@ http://192.168.4.1
 
 ## Implementation Highlights
 
+> [!NOTE]
+> The main loop stays responsive by updating sensors, touch input, web requests and buzzer playback independently.
+
 ### Non-blocking buzzer playback
 
 The buzzer logic uses `millis()` instead of long blocking `delay()` calls. This keeps the system responsive while sounds are playing.
@@ -526,8 +549,8 @@ This makes the configuration survive resets and power loss.
 
 ## Authors
 
-- **Witold Zawada** (https://github.com/PoProstuWitold)
-- **Wiktor Wypyszyński** (https://github.com/Netr0n07)
+- **Witold Zawada** ([GitHub](https://github.com/PoProstuWitold))
+- **Wiktor Wypyszyński** ([GitHub](https://github.com/Netr0n07))
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -536,7 +559,5 @@ This makes the configuration survive resets and power loss.
 ## License
 
 This project is released under the MIT License.
-
-You can change the license depending on how you want to share the project.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
