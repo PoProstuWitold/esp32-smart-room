@@ -2,85 +2,78 @@
 
 # ESP32 Smart Room
 
-**ESP32 Smart Room** is an IoT room monitoring panel built with a **Freenove ESP32 Wrover**, a TFT touchscreen, environmental sensors, RTC module, RGB status LED, buzzer alerts and a built-in WiFi web dashboard.
+**ESP32 Smart Room** is a standalone IoT room monitoring panel built with a **Freenove ESP32 Wrover**, TFT touchscreen, BME280 environmental sensor, DS3231 RTC module, RGB status LED, buzzer alerts and a local WiFi web dashboard.
 
-The device monitors room conditions, displays live data locally on the TFT screen and exposes a simple web panel directly from the ESP32 access point.
+The device reads room conditions, displays live data on the TFT screen and exposes a browser-based dashboard directly from the ESP32 access point. It is designed as a compact embedded prototype that combines sensor communication, touch UI, local alerts, persistent settings and a self-hosted web interface.
 
-> Built as a practical ESP32-based smart room monitor combining sensors, touch UI, local alerts and a standalone web interface.
+<p align="center">
+  <img src="docs/images/final_build.jpg" alt="ESP32 Smart Room final build" width="700">
+</p>
 
-<!-- TABLE OF CONTENTS -->
+---
+
+## Table of Contents
+
 <details>
-  <summary><h3>Table of Contents</h3></summary>
-  <ol>
-    <li><a href="#features">Features</a></li>
-    <li><a href="#demo--photos">Demo / Photos</a></li>
-    <li><a href="#hardware">Hardware</a></li>
-    <li><a href="#how-it-works">How It Works</a></li>
-    <li>
-      <a href="#user-interfaces">User Interfaces</a>
-      <ul>
-        <li><a href="#tft-touchscreen">TFT Touchscreen</a></li>
-        <li><a href="#web-dashboard-1">Web Dashboard</a></li>
-      </ul>
-    </li>
-    <li>
-      <a href="#wiring">Wiring</a>
-      <ul>
-        <li><a href="#i2c-bus">I2C Bus</a></li>
-        <li><a href="#tft-display-and-touch-controller--freenove-esp32-wrover">TFT Display and Touch Controller</a></li>
-        <li><a href="#bme280--freenove-esp32-wrover">BME280</a></li>
-        <li><a href="#ds3231--freenove-esp32-wrover">DS3231</a></li>
-        <li><a href="#rgb-led-common-anode--freenove-esp32-wrover">RGB LED</a></li>
-        <li><a href="#passive-buzzer--freenove-esp32-wrover">Passive Buzzer</a></li>
-      </ul>
-    </li>
-    <li><a href="#software">Software</a></li>
-    <li>
-      <a href="#tft_espi-configuration">TFT_eSPI Configuration</a>
-      <ul>
-        <li><a href="#display-driver">Display driver</a></li>
-        <li><a href="#color-configuration">Color configuration</a></li>
-        <li><a href="#tft-spi-pins">TFT SPI pins</a></li>
-        <li><a href="#touch-controller">Touch controller</a></li>
-        <li><a href="#loaded-fonts">Loaded fonts</a></li>
-        <li><a href="#spi-frequencies">SPI frequencies</a></li>
-      </ul>
-    </li>
-    <li><a href="#setup">Setup</a></li>
-    <li>
-      <a href="#implementation-highlights">Implementation Highlights</a>
-      <ul>
-        <li><a href="#non-blocking-buzzer-playback">Non-blocking buzzer playback</a></li>
-        <li><a href="#shared-settings">Shared settings</a></li>
-        <li><a href="#persistent-configuration">Persistent configuration</a></li>
-      </ul>
-    </li>
-    <li><a href="#authors">Authors</a></li>
-    <li><a href="#license">License</a></li>
-  </ol>
+  <summary><strong>Show contents</strong></summary>
+
+- [Features](#features)
+- [Project Overview](#project-overview)
+- [Demo / Photos](#demo--photos)
+- [Hardware](#hardware)
+- [How It Works](#how-it-works)
+- [User Interfaces](#user-interfaces)
+  - [TFT Touchscreen](#tft-touchscreen)
+  - [Web Dashboard](#web-dashboard)
+- [Wiring](#wiring)
+  - [I2C Bus](#i2c-bus)
+  - [TFT Display and Touch Controller](#tft-display-and-touch-controller--freenove-esp32-wrover)
+  - [BME280](#bme280--freenove-esp32-wrover)
+  - [DS3231](#ds3231--freenove-esp32-wrover)
+  - [RGB LED](#rgb-led-common-anode--freenove-esp32-wrover)
+  - [Passive Buzzer](#passive-buzzer--freenove-esp32-wrover)
+- [Software](#software)
+- [TFT_eSPI Configuration](#tft_espi-configuration)
+- [Setup](#setup)
+- [Implementation Highlights](#implementation-highlights)
+- [Limitations](#limitations)
+- [Possible Improvements](#possible-improvements)
+- [Authors](#authors)
+- [License](#license)
+
 </details>
 
 ---
 
-
-> [!NOTE]
-> This is a compact academic and portfolio-oriented IoT prototype. The code intentionally keeps the whole application in one Arduino sketch to make deployment and review easier. 
->
-> The most important parts of this repository are the working hardware prototype, TFT interface, web dashboard, wiring documentation and reproducible `TFT_eSPI` configuration.
-
 ## Features
 
 - Live temperature, humidity and pressure monitoring
-- Real-time clock using the DS3231 RTC module
-- Local TFT touchscreen interface
-- Built-in WiFi access point
+- Real-time clock using a DS3231 RTC module
+- Local TFT touchscreen interface with multiple screens
+- Built-in ESP32 WiFi access point
 - Web dashboard hosted directly on the ESP32
 - Configurable temperature thresholds
-- RGB LED temperature status indicator
-- Buzzer sound alerts for temperature range changes
+- RGB LED status indicator for temperature ranges
+- Passive buzzer alerts for temperature state changes
 - Persistent settings stored in ESP32 non-volatile memory
 - Min/max temperature tracking since startup
-- I2C and SPI communication in one compact embedded project
+- I2C and SPI communication in one embedded project
+- Reproducible `TFT_eSPI` configuration included in the repository
+
+<p align="right">(<a href="#top">back to top</a>)</p>
+
+---
+
+## Project Overview
+
+> [!NOTE]
+> This project is a functional embedded prototype focused on local monitoring, direct interaction and standalone operation. It does not require an external server, cloud service or mobile application.
+
+The ESP32 communicates with the BME280 sensor over I2C to read room temperature, humidity and pressure. The DS3231 RTC module provides current time independently from the internet. Data is shown locally on a TFT touchscreen and remotely through a web dashboard served by the ESP32.
+
+The project also includes a simple local alert system. Temperature thresholds can be changed from the TFT interface or the web dashboard. Depending on the current temperature range, the RGB LED changes color and the buzzer can play a short sound alert.
+
+The whole firmware is currently kept in a single Arduino sketch to make flashing and reviewing the prototype straightforward.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -88,9 +81,9 @@ The device monitors room conditions, displays live data locally on the TFT scree
 
 ## Demo / Photos
 
-Hardware photos, TFT screenshots, web dashboard preview and Fritzing wiring diagram.
+Hardware photos, TFT screenshots, web dashboard preview and Fritzing wiring diagram are available below.
 
-<details>
+<details open>
   <summary><strong>Final build</strong></summary>
 
 ![Final build](docs/images/final_build.jpg)
@@ -100,7 +93,7 @@ Hardware photos, TFT screenshots, web dashboard preview and Fritzing wiring diag
 <details>
   <summary><strong>TFT screens</strong></summary>
 
-There are 4 TFT screens in total.
+The TFT interface contains four screens.
 
 #### MAIN
 
@@ -148,13 +141,13 @@ There are 4 TFT screens in total.
 | Component | Purpose |
 |---|---|
 | Freenove ESP32 Wrover | Main microcontroller |
-| TFT display with XPT2046 touch controller | Local user interface |
+| TFT display with XPT2046 touch controller | Local graphical user interface |
 | BME280 | Temperature, humidity and pressure sensor |
 | DS3231 | Real-time clock module |
 | RGB LED, common anode | Temperature status indicator |
 | Passive buzzer | Sound alerts |
 | Resistors | Current limiting for LED and buzzer |
-| Jumper wires / breadboard | Prototyping and wiring |
+| Jumper wires / breadboard | Prototype wiring |
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -162,12 +155,9 @@ There are 4 TFT screens in total.
 
 ## How It Works
 
-> [!NOTE]
-> The RGB LED state is based on configurable temperature thresholds stored in ESP32 non-volatile memory.
+The ESP32 reads environmental data from the BME280 sensor and time data from the DS3231 RTC module. The current room state is displayed on the TFT touchscreen and can also be checked from the web dashboard.
 
-The ESP32 reads environmental data from the BME280 sensor and time data from the DS3231 RTC module. The current room state is displayed on the TFT touchscreen and can also be checked in the web dashboard.
-
-The RGB LED changes color depending on the current temperature range:
+The RGB LED changes color depending on configurable temperature thresholds:
 
 | Temperature range | RGB color | Meaning |
 |---|---|---|
@@ -176,9 +166,9 @@ The RGB LED changes color depending on the current temperature range:
 | Between green and yellow threshold | Yellow | Warm |
 | Above yellow threshold | Red | Hot |
 
-When the temperature enters a different range, the RGB LED updates and the buzzer plays a short sound alert, unless muted.
+When the temperature enters a different range, the RGB LED state is updated. If the buzzer is enabled, the device also plays a short alert sound.
 
-Settings such as temperature thresholds and buzzer state are stored using ESP32 `Preferences`, so they are preserved after restart.
+Settings such as temperature thresholds and buzzer state are stored using ESP32 `Preferences`, so they are preserved after restart or power loss.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -197,14 +187,14 @@ The TFT interface contains four screens:
 |---|---|
 | `MAIN` | Temperature, humidity, pressure, current time and quick buzzer mute |
 | `SET` | Temperature thresholds and buzzer settings |
-| `STAT` | WiFi status, sensor status, current state and min/max temperature |
+| `STAT` | WiFi status, sensor status, current temperature state and min/max temperature |
 | `INFO` | Project and author information |
 
 Touch input is handled through the XPT2046 touch controller.
 
 ### Web Dashboard
 
-The ESP32 creates its own WiFi access point and serves a web dashboard.
+The ESP32 creates its own WiFi access point and serves a local web dashboard.
 
 | Parameter | Value |
 |---|---|
@@ -322,16 +312,15 @@ The RGB LED is a **common anode** LED, so the project uses inverted control logi
 | `+` | GPIO13 | Through 220Ω resistor |
 | `-` | GND | Ground |
 
-The passive buzzer is controlled with PWM, which allows it to play simple tones and short melodies.
+The passive buzzer is controlled with PWM, which allows it to play simple tones and short sound signals.
+
+<p align="right">(<a href="#top">back to top</a>)</p>
 
 ---
 
 ## Software
 
-> [!NOTE]
-> The project targets the Arduino ecosystem on ESP32 and uses common libraries available through the Arduino IDE Library Manager.
-
-The project is written using the Arduino ecosystem and uses the following libraries:
+The project targets the Arduino ecosystem on ESP32 and uses the following libraries:
 
 - `SPI.h`
 - `Wire.h`
@@ -445,8 +434,6 @@ The configuration enables the standard TFT_eSPI fonts and smooth fonts:
 #define SPI_TOUCH_FREQUENCY 2500000
 ```
 
-The `docs/tft/User_Setup.h` file is included as a ready-to-use configuration reference for this exact ESP32 + TFT wiring.
-
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 ---
@@ -493,9 +480,6 @@ Connect the Freenove ESP32 Wrover board and upload the project.
 
 After startup, connect to:
 
-> [!CAUTION]
-> The default access point password is intended for a demo/local prototype. Change it before using the project in a less controlled environment.
-
 ```text
 SSID: SmartRoom-ESP32
 Password: 12345678
@@ -507,14 +491,14 @@ Then open:
 http://192.168.4.1
 ```
 
+> [!CAUTION]
+> The default access point password is intended only for a local prototype/demo setup. Change it before using the project outside a controlled environment.
+
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 ---
 
 ## Implementation Highlights
-
-> [!NOTE]
-> The main loop stays responsive by updating sensors, touch input, web requests and buzzer playback independently.
 
 ### Non-blocking buzzer playback
 
@@ -522,13 +506,13 @@ The buzzer logic uses `millis()` instead of long blocking `delay()` calls. This 
 
 During buzzer playback, the ESP32 can still:
 
-- handle the web server,
+- handle web server requests,
 - process touch input,
 - update the TFT screen,
 - read sensor data,
 - update RTC time.
 
-### Shared settings
+### Shared settings between interfaces
 
 Temperature thresholds and buzzer state are shared between the TFT interface and the web dashboard. Changing settings in one interface immediately affects the whole device.
 
@@ -542,6 +526,45 @@ The project uses ESP32 `Preferences` to store:
 - buzzer enabled/disabled state.
 
 This makes the configuration survive resets and power loss.
+
+### Standalone operation
+
+The ESP32 serves its own dashboard and creates its own WiFi access point. This makes the prototype independent from external servers, routers or cloud platforms.
+
+<p align="right">(<a href="#top">back to top</a>)</p>
+
+---
+
+## Limitations
+
+This project is a working prototype, not a production-ready smart home device.
+
+Known limitations:
+
+- the dashboard works in ESP32 access point mode only,
+- there is no user authentication,
+- there is no TLS/HTTPS support,
+- sensor history is not stored long-term,
+- the current build does not include OTA updates,
+- the firmware is kept in one Arduino sketch,
+- the hardware is still a breadboard/prototype setup.
+
+<p align="right">(<a href="#top">back to top</a>)</p>
+
+---
+
+## Possible Improvements
+
+Possible next steps for this project:
+
+- split the firmware into smaller modules,
+- add PlatformIO configuration for reproducible builds,
+- add long-term sensor history and charts,
+- add WiFi station mode in addition to access point mode,
+- add simple dashboard authentication,
+- add OTA firmware updates,
+- design a PCB or enclosure,
+- integrate the device with Home Assistant or MQTT.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
